@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Data — TimetableGen</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a href="{{ url_for('dashboard') }}" class="navbar-brand">🗓️ <span>TimetableGen</span></a>
+  <div class="navbar-links">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('manage') }}" class="active">Manage</a>
+    <a href="{{ url_for('result') }}">Timetable</a>
+    <a href="{{ url_for('about') }}">About</a>
+  </div>
+  <div class="navbar-user">
+    <a href="{{ url_for('logout') }}" class="btn btn-outline" style="padding:0.3rem 0.7rem;">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="page-header">
+    <h1>Manage Data</h1>
+    <p>Add teachers, rooms and subjects before generating the timetable</p>
+  </div>
+
+  <!-- Naming hint banner -->
+  <div class="alert alert-info" style="margin-bottom:1.5rem;">
+    <strong>📌 Naming Rule for Lab Subjects:</strong>
+    Suffix the subject name with <code style="background:rgba(255,255,255,0.1); padding:1px 5px; border-radius:3px;">_lab</code>
+    to mark it as a lab (e.g. <strong>ADA_lab</strong>, <strong>DBMS_lab</strong>).
+    Lab subjects get a 2-period block once per week, split into <strong>A1</strong> and <strong>A2</strong> batches in separate lab rooms.
+    Rooms named with "lab" (e.g. <em>Lab 1</em>, <em>Lab 2</em>) are auto-assigned to lab batches.
+  </div>
+
+  <div class="manage-grid three">
+
+    <!-- ── ADD TEACHER ── -->
+    <div class="card">
+      <div class="card-title"><span class="icon">👨‍🏫</span> Add Teacher</div>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_teacher">
+        <div class="form-group">
+          <label class="form-label">Teacher Name</label>
+          <input type="text" name="teacher_name" class="form-control" placeholder="Dr. John Doe" required>
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center;">Add Teacher</button>
+      </form>
+
+      <div style="margin-top:1.5rem;">
+        <div class="card-title" style="font-size:0.85rem; margin-bottom:0.75rem;">Current Teachers</div>
+        {% if teachers %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th></th></tr></thead>
+            <tbody>
+              {% for t in teachers %}
+              <tr>
+                <td>{{ t.name }}</td>
+                <td>
+                  <form method="POST" onsubmit="return confirm('Delete {{ t.name }}?')">
+                    <input type="hidden" name="action" value="delete_teacher">
+                    <input type="hidden" name="id" value="{{ t.id }}">
+                    <button class="btn btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;">✕</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p style="color:var(--text-muted); font-size:0.8rem;">No teachers added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ── ADD ROOM ── -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🏫</span> Add Room</div>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_room">
+        <div class="form-group">
+          <label class="form-label">Room Name</label>
+          <input type="text" name="room_name" class="form-control"
+                 placeholder="ASF013 or Lab 1" required>
+          <small style="color:var(--text-muted); font-size:0.7rem;">
+            Include "lab" in name for it to be used as a lab room (e.g. "Lab 1")
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capacity</label>
+          <input type="number" name="capacity" class="form-control" placeholder="60" value="60" required>
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center;">Add Room</button>
+      </form>
+
+      <div style="margin-top:1.5rem;">
+        <div class="card-title" style="font-size:0.85rem; margin-bottom:0.75rem;">Current Rooms</div>
+        {% if rooms %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Room</th><th>Type</th><th>Cap</th><th></th></tr></thead>
+            <tbody>
+              {% for r in rooms %}
+              <tr>
+                <td>{{ r.name }}</td>
+                <td>
+                  {% if "lab" in r.name.lower() %}
+                    <span class="badge badge-success">Lab</span>
+                  {% else %}
+                    <span class="badge badge-accent">Theory</span>
+                  {% endif %}
+                </td>
+                <td>{{ r.capacity }}</td>
+                <td>
+                  <form method="POST" onsubmit="return confirm('Delete {{ r.name }}?')">
+                    <input type="hidden" name="action" value="delete_room">
+                    <input type="hidden" name="id" value="{{ r.id }}">
+                    <button class="btn btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;">✕</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p style="color:var(--text-muted); font-size:0.8rem;">No rooms added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ── ADD SUBJECT ── -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📚</span> Add Subject</div>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_subject">
+        <div class="form-group">
+          <label class="form-label">Subject Name</label>
+          <input type="text" name="subject_name" class="form-control"
+                 placeholder="ADA  or  ADA_lab" required>
+          <small style="color:var(--text-muted); font-size:0.7rem;">
+            Add <strong>_lab</strong> suffix for lab subjects (e.g. ADA_lab)
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assign Teacher</label>
+          <select name="teacher_id" class="form-control" required>
+            <option value="">-- Select Teacher --</option>
+            {% for t in teachers %}
+              <option value="{{ t.id }}">{{ t.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Hours per Week [lab 2 slots = 1slot per week]
+            <!-- <span style="color:var(--text-muted); font-size:0.7rem;">(ignored for _lab subjects — always 2 periods)</span> -->
+          </label>
+          <input type="number" name="hours_per_week" class="form-control" min="1" max="5" value="3" required>
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center;">Add Subject</button>
+      </form>
+
+      <div style="margin-top:1.5rem;">
+        <div class="card-title" style="font-size:0.85rem; margin-bottom:0.75rem;">Current Subjects</div>
+        {% if subjects %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Subject</th><th>Teacher</th><th>Hrs</th><th>Type</th><th></th></tr></thead>
+            <tbody>
+              {% for s in subjects %}
+              <tr>
+                <td>{{ s.name }}</td>
+                <td style="color:var(--text-muted); font-size:0.78rem;">{{ s.teacher_name }}</td>
+                <td>
+                  {% if is_lab_subject(s.name) %}
+                    <span style="color:var(--text-muted); font-size:0.72rem;">2 (fixed)</span>
+                  {% else %}
+                    <span class="badge badge-accent">{{ s.hours_per_week }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if is_lab_subject(s.name) %}
+                    <span class="badge badge-success">Lab A1+A2</span>
+                  {% else %}
+                    <span class="badge badge-accent">Theory</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form method="POST" onsubmit="return confirm('Delete {{ s.name }}?')">
+                    <input type="hidden" name="action" value="delete_subject">
+                    <input type="hidden" name="id" value="{{ s.id }}">
+                    <button class="btn btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;">✕</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p style="color:var(--text-muted); font-size:0.8rem;">No subjects added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div><!-- end manage-grid -->
+
+  <div style="margin-top:2rem; text-align:center;">
+    <a href="{{ url_for('generate') }}" class="btn btn-generate"
+       onclick="this.textContent='⏳ Generating...'; this.style.opacity='0.7'; this.style.pointerEvents='none';">
+      ⚡ Generate Timetable Now
+    </a>
+  </div>
+</div>
+</body>
+</html>

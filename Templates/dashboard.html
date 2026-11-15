@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — TimetableGen</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a href="{{ url_for('dashboard') }}" class="navbar-brand">🗓️ <span>TimetableGen</span></a>
+  <div class="navbar-links">
+    <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
+    <a href="{{ url_for('manage') }}">Manage</a>
+    <a href="{{ url_for('result') }}">Timetable</a>
+    <a href="{{ url_for('about') }}">About</a>
+  </div>
+  <div class="navbar-user">
+    <span class="user-badge">{{ user }}</span>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline" style="padding:0.3rem 0.7rem;">Logout</a>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Overview of your timetable system data</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.subjects }}</div>
+      <div class="stat-label">📚 Total Subjects</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.teachers }}</div>
+      <div class="stat-label">👨‍🏫 Total Teachers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.rooms }}</div>
+      <div class="stat-label">🏫 Total Rooms</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.timetables }}</div>
+      <div class="stat-label">📋 Scheduled Slots</div>
+    </div>
+  </div>
+
+  <!-- Generate Section -->
+  <div class="card" style="text-align:center; padding:3rem 2rem;">
+    <div style="font-size:3rem; margin-bottom:1rem;">⚡</div>
+    <h2 style="font-family:var(--font-head); font-size:1.4rem; margin-bottom:0.5rem;">Generate Timetable</h2>
+    <p style="color:var(--text-muted); margin-bottom:2rem; max-width:450px; margin-left:auto; margin-right:auto;">
+      Uses Backtracking + Graph Coloring to produce a clash-free timetable for all subjects and teachers.
+    </p>
+    <a href="{{ url_for('generate') }}" class="btn btn-generate"
+       onclick="this.textContent='⏳ Generating...'; this.style.opacity='0.7'; this.style.pointerEvents='none';">
+      🚀 Generate Timetable
+    </a>
+    <div style="margin-top:1.5rem;">
+      <a href="{{ url_for('result') }}" class="btn btn-outline">📋 View Last Timetable</a>
+      &nbsp;
+      <a href="{{ url_for('manage') }}" class="btn btn-outline">⚙️ Manage Data</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

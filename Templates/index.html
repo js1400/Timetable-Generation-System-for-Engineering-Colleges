@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimetableGen — Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="navbar-brand">🗓️ <span>TimetableGen</span></a>
+  <div class="navbar-links">
+    <a href="{{ url_for('index') }}" class="active">Home</a>
+    <a href="{{ url_for('about') }}">About</a>
+    <a href="{{ url_for('login') }}">Login</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-tag">⚡ Backtracking + Graph Coloring Algorithm</span>
+    <h1>Clash-Free <span class="highlight">Timetable</span><br>Generation System</h1>
+    <p>Automatically generate conflict-free timetables for engineering colleges using advanced constraint satisfaction algorithms.</p>
+    <div class="hero-btns">
+      <a href="{{ url_for('login') }}" class="btn btn-generate">Get Started →</a>
+      <a href="{{ url_for('about') }}" class="btn btn-outline btn-lg">Learn Algorithm</a>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔁</div>
+      <h3>Backtracking Engine</h3>
+      <p>Explores all valid slot assignments and intelligently backtracks when constraints are violated.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎨</div>
+      <h3>Graph Coloring</h3>
+      <p>Models subjects as graph nodes; conflicts (shared teachers) as edges — ensuring no two conflicting subjects share a timeslot.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏫</div>
+      <h3>Multi-Room Support</h3>
+      <p>Assigns rooms intelligently to avoid double-booking and respects room capacity constraints.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📋</div>
+      <h3>Visual Timetable</h3>
+      <p>Generated timetables are displayed in a clean, printable grid format for all 5 working days.</p>
+    </div>
+  </div>
+</section>
+</body>
+</html>

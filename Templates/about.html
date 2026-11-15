@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Algorithm — TimetableGen</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="navbar-brand">🗓️ <span>TimetableGen</span></a>
+  <div class="navbar-links">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('about') }}" class="active">About</a>
+    <a href="{{ url_for('login') }}">Login</a>
+  </div>
+</nav>
+
+<div class="page-wrapper" style="max-width:900px;">
+  <div class="page-header">
+    <h1>Algorithm Details</h1>
+    <p>How Backtracking + Graph Coloring solve the timetable problem</p>
+  </div>
+
+  <div class="manage-grid" style="margin-bottom:1.5rem;">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔁</span> Backtracking Algorithm</div>
+      <div class="algo-block">
+        <h3>What is it?</h3>
+        <p>A depth-first search technique that incrementally builds solutions and abandons ("backtracks") a candidate as soon as it violates a constraint.</p>
+      </div>
+      <div class="algo-block" style="border-left-color:var(--accent2);">
+        <h3>How it works here</h3>
+        <p>Each subject needs N hours per week. The algorithm tries every (day, period, room) combination. If a slot is conflict-free, it assigns it; otherwise it tries the next slot.</p>
+      </div>
+      <ul class="step-list" style="margin-top:1rem;">
+        <li>Pick next unassigned subject-session (MRV heuristic)</li>
+        <li>Try all (day, period, room) slots in random order</li>
+        <li>Check constraints: teacher free? room free? no graph conflict?</li>
+        <li>Assign if valid; recurse to next subject</li>
+        <li>If no slot works → backtrack and try different slot for previous subject</li>
+        <li>Repeat until all subjects are scheduled</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎨</span> Graph Coloring Model</div>
+      <div class="algo-block">
+        <h3>Graph Construction</h3>
+        <p>Each subject is a <strong style="color:var(--accent)">node</strong>. An <strong style="color:var(--accent2)">edge</strong> is added between two subjects if they share the same teacher (they cannot be scheduled at the same time).</p>
+      </div>
+      <div class="algo-block" style="border-left-color:var(--success);">
+        <h3>Coloring = Time Slots</h3>
+        <p>Each "color" represents a (day, period) timeslot. The constraint: no two adjacent nodes (conflicting subjects) can have the same color (same timeslot).</p>
+      </div>
+      <ul class="step-list" style="margin-top:1rem;">
+        <li>Build conflict graph from teacher assignments</li>
+        <li>Sort subjects by degree (most conflicts first)</li>
+        <li>Assign smallest available color (timeslot) to each node</li>
+        <li>Ensure no adjacent nodes share a color</li>
+        <li>Backtracking handles cases where greedy coloring fails</li>
+        <li>Result: provably clash-free schedule</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Constraints -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-title"><span class="icon">📏</span> Constraints Enforced</div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
+      <div class="algo-block" style="margin-bottom:0;">
+        <h3>Hard Constraints</h3>
+        <p>• A teacher cannot take two classes at the same time<br>
+           • A room cannot host two classes simultaneously<br>
+           • No class can appear twice on the same day</p>
+      </div>
+      <div class="algo-block" style="margin-bottom:0; border-left-color:var(--success);">
+        <h3>Soft Constraints</h3>
+        <p>• Subjects spread across different days<br>
+           • MRV heuristic minimizes backtracking<br>
+           • Random slot shuffling for variety</p>
+      </div>
+      <div class="algo-block" style="margin-bottom:0; border-left-color:var(--accent2);">
+        <h3>Complexity</h3>
+        <p>• Time: O(slots^subjects) worst case<br>
+           • Pruning reduces practical runtime<br>
+           • MRV keeps it fast for typical college inputs</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🎓</span> Project Info</div>
+    <table>
+      <tr><td style="color:var(--text-muted); width:200px;">Project Title</td><td>Timetable Generation System for Engineering Colleges</td></tr>
+      <tr><td style="color:var(--text-muted);">Algorithm</td><td><span class="badge badge-accent">Backtracking</span> &nbsp; <span class="badge badge-purple">Graph Coloring</span></td></tr>
+      <tr><td style="color:var(--text-muted);">Problem Type</td><td>Constraint Satisfaction Problem (CSP)</td></tr>
+      <tr><td style="color:var(--text-muted);">Tech Stack</td><td>Python · Flask · MySQL (XAMPP) · HTML/CSS</td></tr>
+      <tr><td style="color:var(--text-muted);">Subject</td><td>Analysis & Design of Algorithms (ADA)</td></tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>
